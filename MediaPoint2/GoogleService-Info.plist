@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>130443128022-52afbhjr2manb0758qf8cpk5mmoh09r6.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.130443128022-52afbhjr2manb0758qf8cpk5mmoh09r6</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBBwr4KTB1V1CAASM1zdNTfGkLNZE-zlrU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>130443128022</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.MauraTai.MediaPoint2</string>
+	<key>PROJECT_ID</key>
+	<string>mediapoint-8b8ee</string>
+	<key>STORAGE_BUCKET</key>
+	<string>mediapoint-8b8ee.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:130443128022:ios:204aa3d0ba4815313bad77</string>
+	<key>DATABASE_URL</key>
+	<string>https://mediapoint-8b8ee.firebaseio.com</string>
+</dict>
+</plist>
