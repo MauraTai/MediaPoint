@@ -77,12 +77,15 @@ PODS:
     - nanopb/encode (= 1.30905.0)
   - nanopb/decode (1.30905.0)
   - nanopb/encode (1.30905.0)
+  - OpalImagePicker (3.0.0)
   - PromisesObjC (1.2.9)
 
 DEPENDENCIES:
   - Firebase/Analytics
+  - Firebase/Core
   - Firebase/Database
   - Firebase/Storage
+  - OpalImagePicker
 
 SPEC REPOS:
   trunk:
@@ -100,6 +103,7 @@ SPEC REPOS:
     - GTMSessionFetcher
     - leveldb-library
     - nanopb
+    - OpalImagePicker
     - PromisesObjC
 
 SPEC CHECKSUMS:
@@ -117,8 +121,9 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: 6f5c8abbab8a9bce4bb3f057e317728ec6182b10
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   nanopb: c43f40fadfe79e8b8db116583945847910cbabc9
+  OpalImagePicker: 38e772dd93a54431fc516b33e1f337c50f745834
   PromisesObjC: b48e0338dbbac2207e611750777895f7a5811b75
 
-PODFILE CHECKSUM: 8acf698f4965edd6e7254996e6da03d278ef25d1
+PODFILE CHECKSUM: b42c686a324a350f690be38f06b23870ad6a4072
 
 COCOAPODS: 1.9.3

@@ -7,8 +7,10 @@ target 'MediaPoint2' do
 
   # Pods for MediaPoint2
 
+pod 'Firebase/Core'
 pod 'Firebase/Analytics'
 pod 'Firebase/Storage'
 pod 'Firebase/Database'
+pod 'OpalImagePicker'
 
 end
