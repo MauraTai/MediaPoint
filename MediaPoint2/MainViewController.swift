@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import Contacts
+import ContactsUI
 import MobileCoreServices
-//import OpalImagePicker
 import Photos
 import FirebaseStorage
 
@@ -17,39 +18,19 @@ class MainViewController: UIViewController {
 
     @IBAction func getMedia() {
         print("Upload button pressed...")
-        //showImages()
         showMedia()
     }
     
-//    @IBAction func getVideos() {
-//       print("upload VIDEOS button pressed...")
-//        showVideos()
-//
-//    }
+    @IBAction func getContacts() {
+        print("Send button pressed...")
+        showContacts()
+    }
+    
     
 }
 
 
 extension MainViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate{
-//OpalImagePickerControllerDelegate
-    
-//    func showImages(){
-//        //let imagePicker = OpalImagePickerController()
-//        let imagePicker = UIImagePickerController()
-//        imagePicker.delegate = self
-//        //imagePicker.imagePickerDelegate = self
-//        imagePicker.sourceType = .photoLibrary
-//        imagePicker.mediaTypes = [kUTTypeImage as String, kUTTypeGIF as String]
-//        present(imagePicker, animated: true)
-//    }
-//
-//    func showVideos(){
-//        let videoPicker = UIImagePickerController()
-//        videoPicker.delegate = self
-//        videoPicker.sourceType = .photoLibrary
-//        videoPicker.mediaTypes = [kUTTypeMovie as String, kUTTypeVideo as String]
-//        present(videoPicker, animated: true)
-//    }
     
     func showMedia(){
         let imagePicker = UIImagePickerController()
@@ -59,109 +40,128 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
         present(imagePicker, animated: true)
     }
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    
+    func showFailAlert(){
+        let failAlert = UIAlertController(title: "The Upload Failed.", message: "Please, wait a few moments and try again OR close the app and launch it again.", preferredStyle: .alert)
         
-        if info[UIImagePickerController.InfoKey.originalImage] != nil{
-            
-            guard let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else {
-                return
-            }
-            
-            guard let imageData = selectedImage.jpegData(compressionQuality: 1) else {
-                return
-            }
-            
-            let imgID = UUID().uuidString
-            
-            storage.child("images/\(imgID).jpeg").putData(imageData, metadata: nil, completion: {_, error in guard error == nil else {
-                print("Upload Failed...")
-                self.dismiss(animated: true)
-                return
-                }
-                print("Upload Successful!") //SHOW IN APP
-                self.dismiss(animated: true)
-            })
-            
-            print(selectedImage)
-            
-            
-        }else if info[UIImagePickerController.InfoKey.mediaURL] != nil{
-            
-            guard let selectedVideo = info[UIImagePickerController.InfoKey.mediaURL] as? URL else {
-                return
-            }
-            
-            do {
-                
-                let videoData = try Data(contentsOf: selectedVideo)
-                let vidID = UUID().uuidString
-                
-                storage.child("videos/\(vidID).mov").putData(videoData, metadata: nil, completion: {_, error in guard error == nil else {
-                    print("Upload Failed...")
-                    self.dismiss(animated: true)
-                    return
-                    }
-                    print("Upload Successful!") //SHOW IN APP
-                    self.dismiss(animated: true)
-                })
-                
-                print(selectedVideo)
-                
-            }catch {
-                print("IT GOOFED")
-            }
-            
-        }
+        failAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
         
-        
-        
-        
-        
-        
-        
-        //dismiss(animated: true)
+        self.present(failAlert, animated: true)
     }
     
     
+    func showSuccessAlert(){
+        let successAlert = UIAlertController(title: "The Upload was Successful.", message: "Upload more media or send what you have already uploaded.", preferredStyle: .alert)
+        
+        successAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        
+        self.present(successAlert, animated: true)
+    }
+    
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+
+        if info[UIImagePickerController.InfoKey.originalImage] != nil{
+
+            guard let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else {
+                return
+            }
+
+            guard let imageData = selectedImage.jpegData(compressionQuality: 1) else {
+                return
+            }
+
+            let imgID = UUID().uuidString
+
+            storage.child("images/\(imgID).jpeg").putData(imageData, metadata: nil, completion: {_, error in guard error == nil else {
+                self.dismiss(animated: true)
+                print("Upload Failed...")
+                self.showFailAlert()
+                return
+                }
+                self.dismiss(animated: true)
+                print("Upload Successful!")
+                self.showSuccessAlert()
+            })
+
+            print(selectedImage)
+
+
+        }else if info[UIImagePickerController.InfoKey.mediaURL] != nil{
+
+            guard let selectedVideo = info[UIImagePickerController.InfoKey.mediaURL] as? URL else {
+                return
+            }
+
+            do {
+
+                let videoData = try Data(contentsOf: selectedVideo)
+                let vidID = UUID().uuidString
+
+                storage.child("videos/\(vidID).mov").putData(videoData, metadata: nil, completion: {_, error in guard error == nil else {
+                    self.dismiss(animated: true)
+                    print("Upload Failed...")
+                    self.showFailAlert()
+                    return
+                    }
+                    self.dismiss(animated: true)
+                    print("Upload Successful!")
+                    self.showSuccessAlert()
+                })
+
+                print(selectedVideo)
+
+            }catch {
+                print("IT GOOFED")
+            }
+        }
+    }
+
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         print("Cancelled...")
         dismiss(animated: true, completion: nil)
     }
+}
+
+
+
+
+extension MainViewController: CNContactPickerDelegate, CNContactViewControllerDelegate{
+    
+    func showContacts(){
+        let contactPicker = CNContactPickerViewController()
+        contactPicker.delegate = self
+        present(contactPicker, animated: true)
+    }
     
     
-    
-    
-//    func imagePickerDidCancel(_ picker: OpalImagePickerController) {
-//        print("Cancelled...")
+//    func contactPicker(_ picker: CNContactPickerViewController, didSelect contactProperty: CNContactProperty) {
+//        let fName = contactProperty.contact.givenName
+//        let lName = contactProperty.contact.familyName
+//        let phoneNum = contactProperty.contact.phoneNumbers.first
+//
+//        print(fName)
+//        print(lName)
+//        print(phoneNum)
 //    }
     
     
-//    private func imagePicker(_ picker: OpalImagePickerController, didFinishPickingImages allImages: [UIImage]) {
-//
-//        var imageNum = 0
-//
-//        for image in allImages {
-//
-//            imageNum += 1
-//
-//            guard let imageData = image.pngData() else {
-//                return
-//            }
-//
-//            print(imageData)
-//
-//            storage.child("images/image\(imageNum).png").putData(imageData, metadata: nil, completion: {_, error in
-//                guard error == nil else {
-//                    print("Upload Failed...")
-//                    return
-//                }
-//
-//            })
-//        }
-//        print("Done...")
-//        dismiss(animated: true)
-//    }
+    func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
+        let fName = contact.givenName
+        let lName = contact.familyName
+        let phoneNum = contact.phoneNumbers.first
+        let email = contact.emailAddresses.first
+
+        print(fName)
+        print(lName)
+        print(phoneNum as Any)
+        print(email as Any)
+    }
     
     
+    func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
+        print("Cancelled...")
+        dismiss(animated: true, completion: nil)
+    }
 }
