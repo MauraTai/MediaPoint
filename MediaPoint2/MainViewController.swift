@@ -8,13 +8,20 @@
 import UIKit
 import Contacts
 import ContactsUI
+import Messages
+import MessageUI
 import MobileCoreServices
 import Photos
 import FirebaseStorage
 
-class MainViewController: UIViewController {
+class MainViewController: UIViewController, MFMessageComposeViewControllerDelegate {
     
     let storage = Storage.storage().reference()
+    let imagesFolder = Storage.storage().reference(withPath: "images/")
+    let videosFolder = Storage.storage().reference(withPath: "videos/")
+    var allImageData = [Data]()
+    var allVideoData = [Data]()
+    let fileID = UUID().uuidString
 
     @IBAction func getMedia() {
         print("Upload button pressed...")
@@ -23,10 +30,83 @@ class MainViewController: UIViewController {
     
     @IBAction func getContacts() {
         print("Send button pressed...")
+        //let user choose what to send
+        getAllPhotosData()
+        getAllVideosData()
         showContacts()
     }
     
     
+    func getAllPhotosData(){
+        allImageData.removeAll()
+        imagesFolder.listAll { (result, error) in
+            if let error = error {
+                print("LIST ALL ERR: \(error) ")
+            }
+            for prefix in result.prefixes {
+                print("PREFIX: \(prefix.name)")
+            }
+            for item in result.items {
+                print("PHOTO ITEM: \(item.name)")
+                item.getData(maxSize: 10000000) { data, error in
+                    if let error = error {
+                        print("DATA ERR: \(error)")
+                    } else {
+                        //let downloadedImageData = data
+                        self.allImageData.append(data!)
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    func getAllVideosData(){
+        allVideoData.removeAll()
+        videosFolder.listAll { (result, error) in
+            if let error = error {
+                print("LIST ALL ERR: \(error) ")
+            }
+            for prefix in result.prefixes {
+                print("PREFIX: \(prefix.name)")
+            }
+            for item in result.items {
+                print("VIDEO ITEM: \(item.name)")
+                item.getData(maxSize: 10000000) { data, error in
+                    if let error = error {
+                        print("DATA ERR: \(error)")
+                    } else {
+                        //let downloadedVideoData = data
+                        self.allVideoData.append(data!)
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
+        
+        switch (result) {
+
+        case.cancelled:
+            print("Cancelled...")
+            dismiss(animated: true)
+
+        case.failed:
+            print("The Message Failed...")
+            dismiss(animated: true)
+            showMessageFailAlert()
+
+        case.sent:
+            print("The Message was Successful...")
+            dismiss(animated: true)
+            showMessageSuccessAlert()
+
+        default:
+            break
+        }
+    }
 }
 
 
@@ -41,8 +121,16 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
     }
     
     
-    func showFailAlert(){
-        let failAlert = UIAlertController(title: "The Upload Failed.", message: "Please, wait a few moments and try again OR close the app and launch it again.", preferredStyle: .alert)
+    func showUploadFailAlert(){
+        let failAlert = UIAlertController(title: "The Upload Failed", message: "Please, wait a few moments and try again OR close the app and launch it again.", preferredStyle: .alert)
+        
+        failAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        
+        self.present(failAlert, animated: true)
+    }
+    
+    func showMessageFailAlert(){
+        let failAlert = UIAlertController(title: "The Message Failed to Send", message: "Please, wait a few moments and try again OR close the app and launch it again.", preferredStyle: .alert)
         
         failAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
         
@@ -50,13 +138,22 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
     }
     
     
-    func showSuccessAlert(){
-        let successAlert = UIAlertController(title: "The Upload was Successful.", message: "Upload more media or send what you have already uploaded.", preferredStyle: .alert)
+    func showUploadSuccessAlert(){
+        let successAlert = UIAlertController(title: "The Upload was Successful", message: "Upload more media or send what you have already uploaded.", preferredStyle: .alert)
         
         successAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
         
         self.present(successAlert, animated: true)
     }
+    
+    func showMessageSuccessAlert(){
+        let successAlert = UIAlertController(title: "The Message Sent Successfully", message: "Thank you for using MediaPoint! Feel free to upload and send more.", preferredStyle: .alert)
+        
+        successAlert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        
+        self.present(successAlert, animated: true)
+    }
+    
     
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -67,24 +164,23 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
                 return
             }
 
-            guard let imageData = selectedImage.jpegData(compressionQuality: 1) else {
-                return
-            }
+            let imageData = selectedImage.jpegData(compressionQuality: 1)
 
             let imgID = UUID().uuidString
 
-            storage.child("images/\(imgID).jpeg").putData(imageData, metadata: nil, completion: {_, error in guard error == nil else {
+            storage.child("images/\(imgID).jpeg").putData(imageData!, metadata: nil, completion: {_, error in guard error == nil else {
                 self.dismiss(animated: true)
                 print("Upload Failed...")
-                self.showFailAlert()
+                self.showUploadFailAlert()
                 return
                 }
                 self.dismiss(animated: true)
                 print("Upload Successful!")
-                self.showSuccessAlert()
+                self.showUploadSuccessAlert()
+                //self.imageFileName = self.storage.child("images/\(imgID).jpeg").name
             })
 
-            print(selectedImage)
+            //print(selectedImage)
 
 
         }else if info[UIImagePickerController.InfoKey.mediaURL] != nil{
@@ -101,15 +197,16 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
                 storage.child("videos/\(vidID).mov").putData(videoData, metadata: nil, completion: {_, error in guard error == nil else {
                     self.dismiss(animated: true)
                     print("Upload Failed...")
-                    self.showFailAlert()
+                    self.showUploadFailAlert()
                     return
                     }
                     self.dismiss(animated: true)
                     print("Upload Successful!")
-                    self.showSuccessAlert()
+                    self.showUploadSuccessAlert()
+                    //self.videoFileName = self.storage.child("videos/\(vidID).mov").name
                 })
 
-                print(selectedVideo)
+                //print(selectedVideo)
 
             }catch {
                 print("IT GOOFED")
@@ -136,27 +233,53 @@ extension MainViewController: CNContactPickerDelegate, CNContactViewControllerDe
     }
     
     
-//    func contactPicker(_ picker: CNContactPickerViewController, didSelect contactProperty: CNContactProperty) {
-//        let fName = contactProperty.contact.givenName
-//        let lName = contactProperty.contact.familyName
-//        let phoneNum = contactProperty.contact.phoneNumbers.first
-//
-//        print(fName)
-//        print(lName)
-//        print(phoneNum)
-//    }
-    
-    
     func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
-        let fName = contact.givenName
-        let lName = contact.familyName
-        let phoneNum = contact.phoneNumbers.first
-        let email = contact.emailAddresses.first
+        
+        let message = MFMessageComposeViewController()
+        message.messageComposeDelegate = self
+        
+        let validLabelTypes = [CNLabelPhoneNumberiPhone, CNLabelPhoneNumberMobile]
+        
+        var phoneNumbers = [""]
+        phoneNumbers.removeAll()
+        
+        let allPhoneNumbers = contact.phoneNumbers
+        
+        for contactPhoneNumber in allPhoneNumbers{
+            let label = contactPhoneNumber.label!
+            if validLabelTypes.contains(label){
+                phoneNumbers.append(contactPhoneNumber.value.stringValue)
+            }
+        }
+//        var phoneNumbers = [""]         getting all phone numbers instead of validTypes
+//        phoneNumbers.removeAll()
+//
+//        for contact in contacts {
+//
+//            let allPhoneNumbers = contact.phoneNumbers
+//
+//            for contactPhoneNumber in allPhoneNumbers{
+//
+//                let label = contactPhoneNumber.label!
+//                if validLabelTypes.contains(label){
+//                    phoneNumbers.append(contactPhoneNumber.value.stringValue)
+//                    print("valid")
+//                }
+//                print("not valid")
+//            }
+//        }
+        message.recipients = phoneNumbers
+        message.body = "...brought to you by MediaPoint :D"
+        for i in allImageData{
+            message.addAttachmentData(i, typeIdentifier: "public.image", filename: "\(fileID).jpeg")
+        }
+        for v in allVideoData{
+            message.addAttachmentData(v, typeIdentifier: "public.movie", filename: "\(fileID).mov")
+        }
 
-        print(fName)
-        print(lName)
-        print(phoneNum as Any)
-        print(email as Any)
+        dismiss(animated: true) { //dismisses contact picker
+            self.present(message, animated: true) //presents message composer
+        }
     }
     
     
