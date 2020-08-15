@@ -1,10 +1,9 @@
 //  MainViewController.swift
-//  MediaPoint2
+//  MediaPoint
 //
 //  Created by Maura Tai on 7/17/20.
 //  Copyright © 2020 Maura Tai. All rights reserved.
 //
-
 import UIKit
 import Contacts
 import ContactsUI
@@ -14,15 +13,22 @@ import MobileCoreServices
 import Photos
 import FirebaseStorage
 
-class MainViewController: UIViewController, MFMessageComposeViewControllerDelegate {
+class MainViewController: UIViewController, MFMessageComposeViewControllerDelegate{
     
     let storage = Storage.storage().reference()
     let imagesFolder = Storage.storage().reference(withPath: "images/")
     let videosFolder = Storage.storage().reference(withPath: "videos/")
-    var allImageData = [Data]()
+    public var allImageData = [Data]()
     var allVideoData = [Data]()
     let fileID = UUID().uuidString
-
+    @IBOutlet var mediaCollectionView: UICollectionView!
+    //@IBOutlet var imageView: UIImageView!
+    
+    
+//    public func configure(with image: UIImage){
+//        imageView.image = allImageData[1] as! UIImage
+//    }
+    
     @IBAction func getMedia() {
         print("Upload button pressed...")
         showMedia()
@@ -30,10 +36,22 @@ class MainViewController: UIViewController, MFMessageComposeViewControllerDelega
     
     @IBAction func getContacts() {
         print("Send button pressed...")
-        //let user choose what to send
-        getAllPhotosData()
-        getAllVideosData()
-        showContacts()
+        getAllPhotosData() //update array
+        getAllVideosData() //update array
+        //showCurrentMediaView() //let user pick what they want to send
+        showContacts() //pick someone(s) and send it
+    }
+    
+    
+    func showCurrentMediaView(){
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let currentMediaView = storyboard.instantiateViewController(identifier: "firecontroller")
+        
+        currentMediaView.modalPresentationStyle = .fullScreen
+        currentMediaView.modalTransitionStyle = .coverVertical
+        
+        present(currentMediaView, animated: true)
     }
     
     
@@ -41,14 +59,14 @@ class MainViewController: UIViewController, MFMessageComposeViewControllerDelega
         allImageData.removeAll()
         imagesFolder.listAll { (result, error) in
             if let error = error {
-                print("LIST ALL ERR: \(error) ")
+                print("LIST ALL IMGs ERR: \(error) ")
             }
             for prefix in result.prefixes {
                 print("PREFIX: \(prefix.name)")
             }
             for item in result.items {
                 print("PHOTO ITEM: \(item.name)")
-                item.getData(maxSize: 10000000) { data, error in
+                item.getData(maxSize: 30000000) { data, error in
                     if let error = error {
                         print("DATA ERR: \(error)")
                     } else {
@@ -65,14 +83,14 @@ class MainViewController: UIViewController, MFMessageComposeViewControllerDelega
         allVideoData.removeAll()
         videosFolder.listAll { (result, error) in
             if let error = error {
-                print("LIST ALL ERR: \(error) ")
+                print("LIST ALL VIDS ERR: \(error) ")
             }
             for prefix in result.prefixes {
                 print("PREFIX: \(prefix.name)")
             }
             for item in result.items {
                 print("VIDEO ITEM: \(item.name)")
-                item.getData(maxSize: 10000000) { data, error in
+                item.getData(maxSize: 30000000) { data, error in
                     if let error = error {
                         print("DATA ERR: \(error)")
                     } else {
@@ -194,7 +212,7 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
                 let videoData = try Data(contentsOf: selectedVideo)
                 let vidID = UUID().uuidString
 
-                storage.child("videos/\(vidID).mov").putData(videoData, metadata: nil, completion: {_, error in guard error == nil else {
+                storage.child("videos/\(vidID).mp4").putData(videoData, metadata: nil, completion: {_, error in guard error == nil else {
                     self.dismiss(animated: true)
                     print("Upload Failed...")
                     self.showUploadFailAlert()
@@ -203,7 +221,7 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
                     self.dismiss(animated: true)
                     print("Upload Successful!")
                     self.showUploadSuccessAlert()
-                    //self.videoFileName = self.storage.child("videos/\(vidID).mov").name
+                    //self.videoFileName = self.storage.child("videos/\(vidID).mp4").name
                 })
 
                 //print(selectedVideo)
@@ -251,30 +269,13 @@ extension MainViewController: CNContactPickerDelegate, CNContactViewControllerDe
                 phoneNumbers.append(contactPhoneNumber.value.stringValue)
             }
         }
-//        var phoneNumbers = [""]         getting all phone numbers instead of validTypes
-//        phoneNumbers.removeAll()
-//
-//        for contact in contacts {
-//
-//            let allPhoneNumbers = contact.phoneNumbers
-//
-//            for contactPhoneNumber in allPhoneNumbers{
-//
-//                let label = contactPhoneNumber.label!
-//                if validLabelTypes.contains(label){
-//                    phoneNumbers.append(contactPhoneNumber.value.stringValue)
-//                    print("valid")
-//                }
-//                print("not valid")
-//            }
-//        }
         message.recipients = phoneNumbers
-        message.body = "...brought to you by MediaPoint :D"
+        message.body = "...brought to you by MediaPoint :)"
         for i in allImageData{
-            message.addAttachmentData(i, typeIdentifier: "public.image", filename: "\(fileID).jpeg")
+            message.addAttachmentData(i, typeIdentifier: "public.jpeg", filename: "\(fileID).jpeg")
         }
         for v in allVideoData{
-            message.addAttachmentData(v, typeIdentifier: "public.movie", filename: "\(fileID).mov")
+            message.addAttachmentData(v, typeIdentifier: "public.mpeg-4", filename: "\(fileID).mp4")
         }
 
         dismiss(animated: true) { //dismisses contact picker
@@ -287,4 +288,42 @@ extension MainViewController: CNContactPickerDelegate, CNContactViewControllerDe
         print("Cancelled...")
         dismiss(animated: true, completion: nil)
     }
+}
+
+
+
+
+extension MainViewController: UICollectionViewDelegate{
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        collectionView.deselectItem(at: indexPath, animated: true)
+        
+        print("You clicked a cell...")
+    }
+}
+
+
+
+
+extension MainViewController: UICollectionViewDataSource{
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
+        return 10
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "", for: indexPath)
+        
+        return cell
+    }
+}
+
+
+
+
+extension MainViewController: UICollectionViewDelegateFlowLayout{
+    
 }

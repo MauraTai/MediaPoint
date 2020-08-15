@@ -15,6 +15,10 @@
 		B25B714D24C25818004A7312 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B25B714C24C25818004A7312 /* Assets.xcassets */; };
 		B25B715024C25818004A7312 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B25B714E24C25818004A7312 /* LaunchScreen.storyboard */; };
 		B25B715A24C25AE4004A7312 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B25B715924C25AE4004A7312 /* GoogleService-Info.plist */; };
+		B2E392C024E7749C00E02F05 /* FirebaseMedia.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2E392BF24E7749C00E02F05 /* FirebaseMedia.storyboard */; };
+		B2E392C224E7757500E02F05 /* FirebaseMediaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E392C124E7757500E02F05 /* FirebaseMediaViewController.swift */; };
+		B2E392C524E7865F00E02F05 /* MediaCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E392C324E7865F00E02F05 /* MediaCollectionViewCell.swift */; };
+		B2E392C624E7865F00E02F05 /* MediaCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B2E392C424E7865F00E02F05 /* MediaCollectionViewCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +33,10 @@
 		B25B714F24C25818004A7312 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B25B715124C25818004A7312 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B25B715924C25AE4004A7312 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		B2E392BF24E7749C00E02F05 /* FirebaseMedia.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = FirebaseMedia.storyboard; sourceTree = "<group>"; };
+		B2E392C124E7757500E02F05 /* FirebaseMediaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseMediaViewController.swift; sourceTree = "<group>"; };
+		B2E392C324E7865F00E02F05 /* MediaCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCollectionViewCell.swift; sourceTree = "<group>"; };
+		B2E392C424E7865F00E02F05 /* MediaCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MediaCollectionViewCell.xib; sourceTree = "<group>"; };
 		C1960F0A2DA81F309CC75465 /* Pods-MediaPoint2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MediaPoint2.release.xcconfig"; path = "Target Support Files/Pods-MediaPoint2/Pods-MediaPoint2.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -68,8 +76,12 @@
 				B25B714324C25817004A7312 /* AppDelegate.swift */,
 				B25B714524C25817004A7312 /* SceneDelegate.swift */,
 				B25B714724C25817004A7312 /* MainViewController.swift */,
+				B2E392C324E7865F00E02F05 /* MediaCollectionViewCell.swift */,
+				B2E392C424E7865F00E02F05 /* MediaCollectionViewCell.xib */,
+				B2E392C124E7757500E02F05 /* FirebaseMediaViewController.swift */,
 				B25B714E24C25818004A7312 /* LaunchScreen.storyboard */,
 				B25B714924C25817004A7312 /* Main.storyboard */,
+				B2E392BF24E7749C00E02F05 /* FirebaseMedia.storyboard */,
 				B25B714C24C25818004A7312 /* Assets.xcassets */,
 				B25B715124C25818004A7312 /* Info.plist */,
 				B25B715924C25AE4004A7312 /* GoogleService-Info.plist */,
@@ -155,6 +167,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B25B715024C25818004A7312 /* LaunchScreen.storyboard in Resources */,
+				B2E392C624E7865F00E02F05 /* MediaCollectionViewCell.xib in Resources */,
+				B2E392C024E7749C00E02F05 /* FirebaseMedia.storyboard in Resources */,
 				B25B715A24C25AE4004A7312 /* GoogleService-Info.plist in Resources */,
 				B25B714D24C25818004A7312 /* Assets.xcassets in Resources */,
 				B25B714B24C25817004A7312 /* Main.storyboard in Resources */,
@@ -210,6 +224,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2E392C524E7865F00E02F05 /* MediaCollectionViewCell.swift in Sources */,
+				B2E392C224E7757500E02F05 /* FirebaseMediaViewController.swift in Sources */,
 				B25B714824C25817004A7312 /* MainViewController.swift in Sources */,
 				B25B714424C25817004A7312 /* AppDelegate.swift in Sources */,
 				B25B714624C25817004A7312 /* SceneDelegate.swift in Sources */,
