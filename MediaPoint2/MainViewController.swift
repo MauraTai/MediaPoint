@@ -19,18 +19,17 @@ class MainViewController: UIViewController, MFMessageComposeViewControllerDelega
     let imagesFolder = Storage.storage().reference(withPath: "images/")
     let videosFolder = Storage.storage().reference(withPath: "videos/")
     public var allImageData = [Data]()
-    var allVideoData = [Data]()
+    public var downloadedImageData: Data!
+    public var downloadedVideoData: Data!
+    public var allVideoData = [Data]()
     let fileID = UUID().uuidString
-    @IBOutlet var mediaCollectionView: UICollectionView!
-    //@IBOutlet var imageView: UIImageView!
+    //@IBOutlet var mediaCollectionView: UICollectionView!
     
-    
-//    public func configure(with image: UIImage){
-//        imageView.image = allImageData[1] as! UIImage
-//    }
     
     @IBAction func getMedia() {
         print("Upload button pressed...")
+//        getAllPhotosData()
+//        getAllVideosData()
         showMedia()
     }
     
@@ -38,15 +37,23 @@ class MainViewController: UIViewController, MFMessageComposeViewControllerDelega
         print("Send button pressed...")
         getAllPhotosData() //update array
         getAllVideosData() //update array
-        //showCurrentMediaView() //let user pick what they want to send
+        
         showContacts() //pick someone(s) and send it
+    }
+    
+    
+    @IBAction func deleteMedia() {
+        print("Delete button pressed...")
+        showCurrentMediaView() //show users what they have uploaded and allow them to delete
     }
     
     
     func showCurrentMediaView(){
         
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let currentMediaView = storyboard.instantiateViewController(identifier: "firecontroller")
+        let currentMediaView = storyboard.instantiateViewController(identifier: "mediaview")
+        
+        //mediaCollectionView.register(MediaCollectionViewCell.nib(), forCellWithReuseIdentifier: "MediaCollectionViewCell")
         
         currentMediaView.modalPresentationStyle = .fullScreen
         currentMediaView.modalTransitionStyle = .coverVertical
@@ -55,7 +62,17 @@ class MainViewController: UIViewController, MFMessageComposeViewControllerDelega
     }
     
     
-    func getAllPhotosData(){
+//    public func getImage() -> UIImage{
+//        var testImage = UIImage(named: "test")
+//
+//        for img in allImageData{
+//            testImage = UIImage(data: img)!
+//        }
+//        return testImage!
+//    }
+    
+    
+    public func getAllPhotosData(){
         allImageData.removeAll()
         imagesFolder.listAll { (result, error) in
             if let error = error {
@@ -70,7 +87,7 @@ class MainViewController: UIViewController, MFMessageComposeViewControllerDelega
                     if let error = error {
                         print("DATA ERR: \(error)")
                     } else {
-                        //let downloadedImageData = data
+                        self.downloadedImageData = data!
                         self.allImageData.append(data!)
                     }
                 }
@@ -94,7 +111,7 @@ class MainViewController: UIViewController, MFMessageComposeViewControllerDelega
                     if let error = error {
                         print("DATA ERR: \(error)")
                     } else {
-                        //let downloadedVideoData = data
+                        self.downloadedVideoData = data!
                         self.allVideoData.append(data!)
                     }
                 }
@@ -293,37 +310,41 @@ extension MainViewController: CNContactPickerDelegate, CNContactViewControllerDe
 
 
 
-extension MainViewController: UICollectionViewDelegate{
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-        collectionView.deselectItem(at: indexPath, animated: true)
-        
-        print("You clicked a cell...")
-    }
-}
-
-
-
-
-extension MainViewController: UICollectionViewDataSource{
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        
-        return 10
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "", for: indexPath)
-        
-        return cell
-    }
-}
-
-
-
-
-extension MainViewController: UICollectionViewDelegateFlowLayout{
-    
-}
+//extension MainViewController: UICollectionViewDelegate{
+//    
+//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        
+//        collectionView.deselectItem(at: indexPath, animated: true)
+//        
+//        print("You clicked a cell...")
+//    }
+//}
+//
+//
+//
+//
+//extension MainViewController: UICollectionViewDataSource{
+//    
+//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        
+//        return 10
+//    }
+//    
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        
+//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MediaCollectionViewCell", for: indexPath) as! MediaCollectionViewCell
+//        
+//        let testImage: UIImage = UIImage(data: downloadedImageData)!
+//        
+//        cell.configure(with: testImage)
+//        
+//        return cell
+//    }
+//}
+//
+//
+//
+//
+//extension MainViewController: UICollectionViewDelegateFlowLayout{
+//    
+//}

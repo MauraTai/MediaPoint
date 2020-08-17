@@ -7,17 +7,22 @@
 //
 import UIKit
 
-class MediaCollectionViewCell: UICollectionViewCell {
+class MediaCollectionViewCell: UICollectionViewCell{
     
     @IBOutlet var imageView: UIImageView!
 
+    
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
     }
     
+    
     public func configure(with image: UIImage){
-        //set cell's image here
+        imageView.image = image
     }
-
+    
+    
+    static func nib() -> UINib {
+        return UINib(nibName: "MediaCollectionViewCell", bundle: nil)
+    }
 }
