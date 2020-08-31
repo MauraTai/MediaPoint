@@ -1,10 +1,8 @@
-//
 //  MediaCollectionViewCell.swift
 //  MediaPoint
-//
-//  Created by Maura Tai on 8/14/20.
+//  Created by Maura Tai on 7/17/20.
 //  Copyright © 2020 Maura Tai. All rights reserved.
-//
+
 import UIKit
 
 class MediaCollectionViewCell: UICollectionViewCell{

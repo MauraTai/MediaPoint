@@ -1,16 +1,14 @@
 //  MainViewController.swift
 //  MediaPoint
-//
 //  Created by Maura Tai on 7/17/20.
 //  Copyright © 2020 Maura Tai. All rights reserved.
-//
+
 import UIKit
 import Contacts
 import ContactsUI
 import Messages
 import MessageUI
 import MobileCoreServices
-import Photos
 import FirebaseStorage
 
 class MainViewController: UIViewController, MFMessageComposeViewControllerDelegate{
@@ -19,99 +17,78 @@ class MainViewController: UIViewController, MFMessageComposeViewControllerDelega
     let imagesFolder = Storage.storage().reference(withPath: "images/")
     let videosFolder = Storage.storage().reference(withPath: "videos/")
     public var allImageData = [Data]()
-    public var downloadedImageData: Data!
-    public var downloadedVideoData: Data!
     public var allVideoData = [Data]()
     let fileID = UUID().uuidString
-    //@IBOutlet var mediaCollectionView: UICollectionView!
+    
+    override func viewDidLoad() {
+        getAllData()
+    }
     
     
     @IBAction func getMedia() {
-        print("Upload button pressed...")
-//        getAllPhotosData()
-//        getAllVideosData()
+        //print("Upload button pressed...")
         showMedia()
     }
     
     @IBAction func getContacts() {
-        print("Send button pressed...")
-        getAllPhotosData() //update array
-        getAllVideosData() //update array
-        
-        showContacts() //pick someone(s) and send it
+        //print("Send button pressed...")
+        getAllData()
+        showContacts()
     }
     
     
-    @IBAction func deleteMedia() {
-        print("Delete button pressed...")
-        showCurrentMediaView() //show users what they have uploaded and allow them to delete
-    }
-    
-    
-    func showCurrentMediaView(){
-        
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let currentMediaView = storyboard.instantiateViewController(identifier: "mediaview")
-        
-        //mediaCollectionView.register(MediaCollectionViewCell.nib(), forCellWithReuseIdentifier: "MediaCollectionViewCell")
-        
-        currentMediaView.modalPresentationStyle = .fullScreen
-        currentMediaView.modalTransitionStyle = .coverVertical
-        
-        present(currentMediaView, animated: true)
-    }
-    
-    
-//    public func getImage() -> UIImage{
-//        var testImage = UIImage(named: "test")
-//
-//        for img in allImageData{
-//            testImage = UIImage(data: img)!
-//        }
-//        return testImage!
+//    @IBAction func deleteMedia() {
+//        print("Delete button pressed...")
+//        showCurrentMediaView()
 //    }
     
     
-    public func getAllPhotosData(){
+//    func showCurrentMediaView(){
+//
+//        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+//        let currentMediaView = storyboard.instantiateViewController(identifier: "mediaview")
+//
+//        currentMediaView.modalPresentationStyle = .fullScreen
+//        currentMediaView.modalTransitionStyle = .coverVertical
+//
+//        present(currentMediaView, animated: true)
+//    }
+    
+    
+    public func getAllData(){
         allImageData.removeAll()
+        allVideoData.removeAll()
         imagesFolder.listAll { (result, error) in
             if let error = error {
                 print("LIST ALL IMGs ERR: \(error) ")
             }
             for prefix in result.prefixes {
-                print("PREFIX: \(prefix.name)")
+                print("IMG PREFIX: \(prefix.name)")
             }
             for item in result.items {
-                print("PHOTO ITEM: \(item.name)")
-                item.getData(maxSize: 30000000) { data, error in
+                //print("PHOTO DATA: \(item.name)")
+                item.getData(maxSize: 20000000) { data, error in
                     if let error = error {
-                        print("DATA ERR: \(error)")
+                        print("IMG DATA ERR: \(error)")
                     } else {
-                        self.downloadedImageData = data!
                         self.allImageData.append(data!)
                     }
                 }
             }
         }
-    }
-    
-    
-    func getAllVideosData(){
-        allVideoData.removeAll()
         videosFolder.listAll { (result, error) in
             if let error = error {
-                print("LIST ALL VIDS ERR: \(error) ")
+                print("LIST ALL VIDs ERR: \(error) ")
             }
             for prefix in result.prefixes {
-                print("PREFIX: \(prefix.name)")
+                print("VIDs PREFIX: \(prefix.name)")
             }
             for item in result.items {
-                print("VIDEO ITEM: \(item.name)")
-                item.getData(maxSize: 30000000) { data, error in
+                //print("VIDEO DATA: \(item.name)")
+                item.getData(maxSize: 60000000) { data, error in
                     if let error = error {
-                        print("DATA ERR: \(error)")
+                        print("VIDs DATA ERR: \(error)")
                     } else {
-                        self.downloadedVideoData = data!
                         self.allVideoData.append(data!)
                     }
                 }
@@ -120,21 +97,44 @@ class MainViewController: UIViewController, MFMessageComposeViewControllerDelega
     }
     
     
+//    func getAllVideosData(){
+//        allVideoData.removeAll()
+//        videosFolder.listAll { (result, error) in
+//            if let error = error {
+//                print("LIST ALL VIDs ERR: \(error) ")
+//            }
+//            for prefix in result.prefixes {
+//                print("VIDs PREFIX: \(prefix.name)")
+//            }
+//            for item in result.items {
+//                //print("VIDEO DATA: \(item.name)")
+//                item.getData(maxSize: 60000000) { data, error in
+//                    if let error = error {
+//                        print("VIDs DATA ERR: \(error)")
+//                    } else {
+//                        self.allVideoData.append(data!)
+//                    }
+//                }
+//            }
+//        }
+//    }
+    
+    
     func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
         
         switch (result) {
 
         case.cancelled:
-            print("Cancelled...")
+            //print("Cancelled...")
             dismiss(animated: true)
 
         case.failed:
-            print("The Message Failed...")
+            //print("The Message Failed...")
             dismiss(animated: true)
             showMessageFailAlert()
 
         case.sent:
-            print("The Message was Successful...")
+            //print("The Message was Successful...")
             dismiss(animated: true)
             showMessageSuccessAlert()
 
@@ -151,7 +151,7 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
         imagePicker.sourceType = .photoLibrary
-        imagePicker.mediaTypes = [kUTTypeMovie as String, kUTTypeVideo as String, kUTTypeImage as String, kUTTypeGIF as String]
+        imagePicker.mediaTypes = [kUTTypeMovie as String, kUTTypeVideo as String, kUTTypeImage as String]
         present(imagePicker, animated: true)
     }
     
@@ -199,24 +199,20 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
                 return
             }
 
-            let imageData = selectedImage.jpegData(compressionQuality: 1)
+            let imageData = selectedImage.jpegData(compressionQuality: 0.5)
 
             let imgID = UUID().uuidString
 
             storage.child("images/\(imgID).jpeg").putData(imageData!, metadata: nil, completion: {_, error in guard error == nil else {
                 self.dismiss(animated: true)
-                print("Upload Failed...")
+                //print("Upload Failed...")
                 self.showUploadFailAlert()
                 return
                 }
                 self.dismiss(animated: true)
-                print("Upload Successful!")
+                //print("Upload Successful!")
                 self.showUploadSuccessAlert()
-                //self.imageFileName = self.storage.child("images/\(imgID).jpeg").name
             })
-
-            //print(selectedImage)
-
 
         }else if info[UIImagePickerController.InfoKey.mediaURL] != nil{
 
@@ -231,27 +227,22 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
 
                 storage.child("videos/\(vidID).mp4").putData(videoData, metadata: nil, completion: {_, error in guard error == nil else {
                     self.dismiss(animated: true)
-                    print("Upload Failed...")
+                    //print("Upload Failed...")
                     self.showUploadFailAlert()
                     return
                     }
                     self.dismiss(animated: true)
-                    print("Upload Successful!")
+                    //print("Upload Successful!")
                     self.showUploadSuccessAlert()
-                    //self.videoFileName = self.storage.child("videos/\(vidID).mp4").name
-                })
-
-                //print(selectedVideo)
-
-            }catch {
-                print("IT GOOFED")
+                })}catch {
+                print("CRITICAL ERROR")
             }
         }
     }
 
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        print("Cancelled...")
+        //print("Cancelled...")
         dismiss(animated: true, completion: nil)
     }
 }
@@ -287,7 +278,7 @@ extension MainViewController: CNContactPickerDelegate, CNContactViewControllerDe
             }
         }
         message.recipients = phoneNumbers
-        message.body = "...brought to you by MediaPoint :)"
+        message.body = ""
         for i in allImageData{
             message.addAttachmentData(i, typeIdentifier: "public.jpeg", filename: "\(fileID).jpeg")
         }
@@ -302,49 +293,7 @@ extension MainViewController: CNContactPickerDelegate, CNContactViewControllerDe
     
     
     func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
-        print("Cancelled...")
+        //print("Cancelled...")
         dismiss(animated: true, completion: nil)
     }
 }
-
-
-
-
-//extension MainViewController: UICollectionViewDelegate{
-//    
-//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        
-//        collectionView.deselectItem(at: indexPath, animated: true)
-//        
-//        print("You clicked a cell...")
-//    }
-//}
-//
-//
-//
-//
-//extension MainViewController: UICollectionViewDataSource{
-//    
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        
-//        return 10
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        
-//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MediaCollectionViewCell", for: indexPath) as! MediaCollectionViewCell
-//        
-//        let testImage: UIImage = UIImage(data: downloadedImageData)!
-//        
-//        cell.configure(with: testImage)
-//        
-//        return cell
-//    }
-//}
-//
-//
-//
-//
-//extension MainViewController: UICollectionViewDelegateFlowLayout{
-//    
-//}

@@ -1,10 +1,7 @@
-//
 //  SceneDelegate.swift
-//  MediaPoint2
-//
+//  MediaPoint
 //  Created by Maura Tai on 7/17/20.
 //  Copyright © 2020 Maura Tai. All rights reserved.
-//
 
 import UIKit
 
